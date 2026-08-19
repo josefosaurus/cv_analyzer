@@ -2,9 +2,8 @@ from dotenv import load_dotenv
 from typing import cast
 
 from langchain_openai import ChatOpenAI
-from models.cv_model import AnalisisCV
-from prompts.cv_prompts import crear_sistema_prompts
-
+from app.models.cv_model import AnalisisCV
+from app.prompts.cv_prompts import crear_sistema_prompts
 
 load_dotenv()
 

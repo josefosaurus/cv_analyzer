@@ -2,9 +2,10 @@ import PyPDF2
 from io import BytesIO
 
 
-def extraer_texto_pdf(archivo_pdf):
+def extraer_texto_pdf(contenido_pdf: bytes) -> str:
+    """Extrae texto de bytes crudos de un PDF (leído previamente desde un UploadFile)."""
     try:
-        pdf_reader = PyPDF2.PdfReader(BytesIO(archivo_pdf.read()))
+        pdf_reader = PyPDF2.PdfReader(BytesIO(contenido_pdf))
         texto_completo = ""
         for numero_pagina, pagina in enumerate(pdf_reader.pages, 1):
             text_pagina = pagina.extract_text()
@@ -15,5 +16,7 @@ def extraer_texto_pdf(archivo_pdf):
         if not texto_completo:
             raise ValueError("El PDF no contiene texto extraíble.")
         return texto_completo
+    except ValueError:
+        raise
     except Exception as e:
         raise ValueError(f"Error al procesar el PDF: {str(e)}")

@@ -1,0 +1,35 @@
+---
+import Layout from "../layouts/Layout.astro";
+import UploadForm from "../components/UploadForm";
+import ResultsPanel from "../components/ResultsPanel";
+---
+
+<Layout title="Vaultis | Matching Engine">
+  <main class="shell">
+    <header class="brand-header">
+      <div class="brand-mark" aria-hidden="true">V</div>
+      <div class="brand-copy">
+        <p class="brand-kicker">Talent Match Engine</p>
+        <h1>Vaultis</h1>
+      </div>
+    </header>
+
+    <div class="dashboard-grid">
+      <section class="panel panel-input">
+        <div class="panel-head">
+          <span class="eyebrow">Input</span>
+          <p>CV + Job brief</p>
+        </div>
+        <UploadForm client:load />
+      </section>
+
+      <section class="panel panel-results">
+        <div class="panel-head">
+          <span class="eyebrow">Assessment</span>
+          <p>Candidate fit</p>
+        </div>
+        <ResultsPanel client:load />
+      </section>
+    </div>
+  </main>
+</Layout>

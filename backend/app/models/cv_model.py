@@ -16,7 +16,10 @@ class AnalisisCV(BaseModel):
     fortalezas: list[str] = Field(
         description="Lista de 3-5 fortalezas relevantes del candidato"
     )
-    areas_mejora: list[str] = ["Descripción breve de 2-4 áreas de mejora del candidato"]
+    areas_mejora: list[str] = Field(
+        default_factory=list,
+        description="Lista de 2-4 áreas de mejora o desarrollo del candidato",
+    )
     porcentaje_ajuste: float = Field(
         description="Porcentaje de ajuste (0-100) al puesto basado en su CV",
         ge=0,
