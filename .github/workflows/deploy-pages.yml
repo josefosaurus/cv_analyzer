@@ -35,7 +35,7 @@ jobs:
       - name: Build Astro site
         working-directory: frontend
         env:
-          PUBLIC_API_BASE_URL: https://cv-analyzer-git-763301961787.europe-west1.run.app
+          PUBLIC_API_BASE_URL: https://cv-analyzer-backend-763301961787.europe-west1.run.app/api
         run: npm run build
 
       - name: Upload artifact
