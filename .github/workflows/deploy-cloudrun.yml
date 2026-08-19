@@ -30,10 +30,9 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          gcloud builds submit \
-            --suppress-logs \
-            --tag europe-west1-docker.pkg.dev/$PROJECT_ID/cv-analyzer/cv-analyzer/backend \
-            ./backend
+          IMAGE=europe-west1-docker.pkg.dev/$PROJECT_ID/cv-analyzer/cv-analyzer/backend
+          docker build --tag "$IMAGE" ./backend
+          docker push "$IMAGE"
 
       - name: Deploy to Cloud Run
         run: |
