@@ -31,15 +31,66 @@ Set your API key in a `.env` file:
 
 ```
 OPENAI_API_KEY=sk-...
+PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
-## Run
+## Run locally
 
 ```bash
-streamlit run app.py
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Opens at `http://localhost:8501`.
+```bash
+cd frontend
+npm install
+npm run dev -- --host 0.0.0.0
+```
+
+The app runs on `http://localhost:4321` and calls the backend at `http://localhost:8000`.
+
+## Production deployment
+
+This repo is designed to deploy the frontend on GitHub Pages and the backend on Google Cloud Run.
+
+### Backend on Cloud Run
+
+```bash
+export PROJECT_ID=your-project-id
+export REGION=us-central1
+export SERVICE_NAME=cv-analyzer-backend
+
+# Build image from backend folder
+gcloud builds submit --tag us-central1-docker.pkg.dev/$PROJECT_ID/cv-analyzer/backend ./backend
+
+# Deploy container
+gcloud run deploy $SERVICE_NAME \
+  --image us-central1-docker.pkg.dev/$PROJECT_ID/cv-analyzer/backend \
+  --platform managed \
+  --region $REGION \
+  --allow-unauthenticated \
+  --set-secrets OPENAI_API_KEY=OPENAI_API_KEY:latest
+```
+
+### Frontend on GitHub Pages
+
+Build the Astro site and publish the `frontend/dist` folder with GitHub Actions.
+Set the environment variable before building:
+
+```bash
+PUBLIC_API_BASE_URL=https://your-backend-url.a.run.app
+cd frontend
+npm install
+npm run build
+```
+
+The GitHub Pages site should use this backend URL as the API base.
+
+## Usage
+
+1. Upload a PDF resume (text-based, not scanned)
+2. Paste the job description
+3. Click **Analizar Candidato**
 
 ## Usage
 

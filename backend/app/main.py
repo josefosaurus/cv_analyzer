@@ -1,4 +1,5 @@
 import logging
+import os
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,13 +12,24 @@ logger = logging.getLogger("cv_analyzer")
 
 app = FastAPI(title="CV Analyzer API", version="1.0.0")
 
-# CORS is only relevant for local dev (frontend served on a different port); in
-# production nginx proxies both apps under the same origin.
+allowed_origins = [
+    "http://localhost:4321",
+    "http://localhost:3000",
+    "http://127.0.0.1:4321",
+    "http://127.0.0.1:3000",
+]
+extra_origins = os.getenv("CORS_ALLOWED_ORIGINS", "")
+if extra_origins:
+    allowed_origins.extend(
+        origin.strip() for origin in extra_origins.split(",") if origin.strip()
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4321", "http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 
