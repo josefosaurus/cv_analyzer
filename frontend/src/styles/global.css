@@ -309,6 +309,10 @@ button {
   margin-top: 6px;
 }
 
+.turnstile-widget {
+  min-height: 65px;
+}
+
 .primary-button,
 .secondary-button {
   display: inline-flex;

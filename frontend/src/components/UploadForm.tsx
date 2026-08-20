@@ -1,11 +1,54 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { analysisStore, resetAnalysis, setProgress } from "../lib/store";
 import { analyzeCV } from "../lib/api";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+          "expired-callback": () => void;
+          "error-callback": () => void;
+        },
+      ) => void;
+    };
+  }
+}
+
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
 export default function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [descripcionPuesto, setDescripcionPuesto] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileContainer = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!turnstileSiteKey || !turnstileContainer.current) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.onload = () => {
+      if (turnstileContainer.current && window.turnstile) {
+        window.turnstile.render(turnstileContainer.current, {
+          sitekey: turnstileSiteKey,
+          callback: setTurnstileToken,
+          "expired-callback": () => setTurnstileToken(""),
+          "error-callback": () => setTurnstileToken(""),
+        });
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => script.remove();
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -19,12 +62,16 @@ export default function UploadForm() {
       analysisStore.set({ status: "error", progress: 0, result: null, error: "Por favor proporciona una descripción detallada del puesto" });
       return;
     }
+    if (turnstileSiteKey && !turnstileToken) {
+      analysisStore.set({ status: "error", progress: 0, result: null, error: "Completa la verificación de seguridad" });
+      return;
+    }
 
     setSubmitting(true);
     setProgress(25);
     try {
       setProgress(50);
-      const result = await analyzeCV(file, descripcion);
+      const result = await analyzeCV(file, descripcion, turnstileToken);
       setProgress(75);
       analysisStore.set({ status: "success", progress: 100, result, error: null });
     } catch (err) {
@@ -91,13 +138,15 @@ export default function UploadForm() {
       </div>
 
       <div className="form-actions">
-        <button type="submit" disabled={submitting} className="primary-button">
+        <button type="submit" disabled={submitting || Boolean(turnstileSiteKey && !turnstileToken)} className="primary-button">
           {submitting ? "Analyzing..." : "Analyze profile"}
         </button>
         <button type="button" onClick={handleClear} disabled={submitting} className="secondary-button">
           Clear
         </button>
       </div>
+
+      {turnstileSiteKey && <div ref={turnstileContainer} className="turnstile-widget" />}
     </form>
   );
 }

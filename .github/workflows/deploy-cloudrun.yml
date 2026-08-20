@@ -41,4 +41,5 @@ jobs:
             --platform managed \
             --region $REGION \
             --allow-unauthenticated \
-            --set-secrets OPENAI_API_KEY=OPENAI_API_KEY:latest
+            --set-env-vars APP_ENV=production,CORS_ALLOWED_ORIGINS=https://josefosaurus.github.io \
+            --set-secrets OPENAI_API_KEY=OPENAI_API_KEY:latest,TURNSTILE_SECRET_KEY=TURNSTILE_SECRET_KEY:latest

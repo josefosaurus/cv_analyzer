@@ -36,6 +36,7 @@ jobs:
         working-directory: frontend
         env:
           PUBLIC_API_BASE_URL: https://cv-analyzer-backend-763301961787.europe-west1.run.app/api
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
         run: npm run build
 
       - name: Upload artifact

@@ -32,7 +32,19 @@ Set your API key in a `.env` file:
 ```
 OPENAI_API_KEY=sk-...
 PUBLIC_API_BASE_URL=http://localhost:8000
+PUBLIC_TURNSTILE_SITE_KEY=0x...
+TURNSTILE_SECRET_KEY=0x...
 ```
+
+## Protección contra abuso
+
+El formulario usa Cloudflare Turnstile y la API limita cada IP a 5 análisis cada 10 minutos.
+
+1. Crea un widget Turnstile para `josefosaurus.github.io`.
+2. Añade su clave pública como variable de Actions `PUBLIC_TURNSTILE_SITE_KEY`.
+3. Añade su clave secreta a Secret Manager como `TURNSTILE_SECRET_KEY` y permite que la cuenta de ejecución de Cloud Run la lea.
+
+En producción, la API rechaza solicitudes si falta la clave secreta. En desarrollo local, Turnstile se omite cuando `TURNSTILE_SECRET_KEY` está vacía.
 
 ## Run locally
 
