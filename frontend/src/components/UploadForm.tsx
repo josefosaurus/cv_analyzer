@@ -13,7 +13,8 @@ declare global {
           "expired-callback": () => void;
           "error-callback": () => void;
         },
-      ) => void;
+      ) => string;
+      reset: (widgetId?: string) => void;
     };
   }
 }
@@ -27,6 +28,7 @@ export default function UploadForm() {
   const [submitting, setSubmitting] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const turnstileContainer = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string>();
 
   useEffect(() => {
     if (!turnstileSiteKey || !turnstileContainer.current) {
@@ -38,7 +40,7 @@ export default function UploadForm() {
     script.async = true;
     script.onload = () => {
       if (turnstileContainer.current && window.turnstile) {
-        window.turnstile.render(turnstileContainer.current, {
+        turnstileWidgetId.current = window.turnstile.render(turnstileContainer.current, {
           sitekey: turnstileSiteKey,
           callback: setTurnstileToken,
           "expired-callback": () => setTurnstileToken(""),
@@ -84,12 +86,21 @@ export default function UploadForm() {
       });
     } finally {
       setSubmitting(false);
+      resetTurnstile();
+    }
+  }
+
+  function resetTurnstile() {
+    setTurnstileToken("");
+    if (turnstileSiteKey && window.turnstile) {
+      window.turnstile.reset(turnstileWidgetId.current);
     }
   }
 
   function handleClear() {
     setFile(null);
     setDescripcionPuesto("");
+    resetTurnstile();
     resetAnalysis();
   }
 
