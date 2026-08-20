@@ -19,6 +19,7 @@ declare global {
 }
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const turnstileScriptUrl = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
 export default function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
@@ -33,7 +34,7 @@ export default function UploadForm() {
     }
 
     const script = document.createElement("script");
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.src = turnstileScriptUrl;
     script.async = true;
     script.onload = () => {
       if (turnstileContainer.current && window.turnstile) {
